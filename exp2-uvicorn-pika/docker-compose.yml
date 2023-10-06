@@ -1,0 +1,29 @@
+version: '3'
+
+services:
+  rabbitmq: 
+    image: rabbitmq:3-management
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    volumes:
+      - ./rabbitmq:/var/lib/rabbitmq
+    environment:
+      - RABBITMQ_DEFAULT_USER=guest
+      - RABBITMQ_DEFAULT_PASS=guest
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:15672"]
+      interval: 5s
+      timeout: 1s
+      retries: 30
+
+  app:
+    build: .
+    ports:
+      - "8000:8000"
+    links:
+      - rabbitmq
+    depends_on:
+      - rabbitmq
+    volumes:
+      - ./app:/app
